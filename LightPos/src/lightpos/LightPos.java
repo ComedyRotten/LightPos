@@ -15,7 +15,32 @@ public class LightPos {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+        int numParents = 5;
+        int numOffspring = 200;
+        double mutationInitialStepSize = 1;
+        int terminationCount = 100;
+        int n = 8; //number of lights
+        int roomWidth = 120; //inches
+        int roomLength = 240; // inches
+        //int optimalLightHeight = 36; // inches (Not currently implemented
+        
+        LightPos_API myApi = new LightPos_API(numParents, numOffspring, n, 
+                roomWidth, roomLength, 
+                mutationInitialStepSize, terminationCount);
+        light[] bestSolution = myApi.getBestSolution();
+        System.out.println("Best solution for " + roomWidth + "\"x" + 
+                roomLength +"\" room: {");
+        for (int i = 0; i < bestSolution.length; i++) {
+            // If the light is on and contributes to the solution
+            if (bestSolution[i].isOn())
+            {
+                System.out.print("Light " + (i+1) + ": ");
+                System.out.print("x=" + bestSolution[i].getPos_x());
+                System.out.print("y=" + bestSolution[i].getPos_y());
+                System.out.print("Watts=" + bestSolution[i].getWatts());
+            }
+        }
+        System.out.println("} = " + myApi.getFitness(bestSolution));
     }
     
 }
