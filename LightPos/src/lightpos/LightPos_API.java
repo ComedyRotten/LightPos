@@ -1,7 +1,10 @@
 package lightpos;
 
+
+
 import java.util.Arrays;
 import java.util.Random;
+import java.util.Scanner;
 
 /**
  * LightPos_API
@@ -52,7 +55,9 @@ public class LightPos_API {
     private final int nNumber; // number of lights, each light has 4 parameters
     private final double overallLearningRate;
     private final double coordinateLearningRate;
-    
+    private int row = 7;
+    private int col = 7;
+    private int [][] matrix;
     // Randomization generator
     private final Random generatorRandom = new Random();
     
@@ -195,10 +200,79 @@ public class LightPos_API {
      */
     private int getFittestIndex(light [] individuals)
     {
+        int sum1 =0;
+        int sum2 = 0;
+        
+        
+        
+        //Create 2D array to input values for Sensor
+        int[][] inputSensor = new int[row][col];
+        Scanner in = new Scanner(System.in);
+        for(int row = 0; row< matrix.length; row++){ 
+              for(int col = 0 ;col< matrix[row].length; col++){ 
+                   System.out.println("enter the elementss for the Input Sensor"); 
+                  inputSensor[row][col] = in.nextInt(); 
+               } System.out.println(); 
+          } 
+
+           for(int row = 0; row< matrix.length; row++){
+       for(int col = 0 ;col< matrix[row].length; col++){ 
+             System.out.println(inputSensor[row][col]);
+       } 
+      System.out.println(); 
+         }
+         
+           // Create 2D array to imputvalues for calculated variation
+           int[][] calVar = new int[row][col];
+     
+        for(int row = 0; row< matrix.length; row++){ 
+              for(int col = 0 ;col< matrix[row].length; col++){ 
+                   System.out.println("enter the elementss for the Calculated Variation"); 
+                  calVar[row][col] = in.nextInt(); 
+               } System.out.println(); 
+          } 
+
+           for(int row = 0; row< matrix.length; row++){
+       for(int col = 0 ;col< matrix[row].length; col++){ 
+             System.out.println(calVar[row][col]);
+       } 
+      System.out.println(); 
+         }
+          
+           //Sum all the rows and columns in the Sensor table
+        int[] colSum1 =new int[inputSensor[0].length];
+        for (int i = 0; i < inputSensor.length; i++){   
+        for (int j = 0; j < inputSensor[i].length; j++){                
+        sum1 += inputSensor[i][j];
+        colSum1[j] += inputSensor[i][j];
+    }
+    System.out.println("The sum of rows in Sensor table =" + sum1);
+    }  
+    for(int k=0;k<colSum1.length;k++){
+    System.out.println("The sum of columns in Sensor table =" + colSum1[k]);
+    } 
+         
+    
+            //Sum all the rows and columns in the Caculated Variation table
+            int[] colSum2 =new int[calVar[0].length];
+        for (int i = 0; i < calVar.length; i++){   
+        for (int j = 0; j < calVar[i].length; j++){                
+        sum2 += calVar[i][j];
+        colSum2[j] += calVar[i][j];
+    }
+    System.out.println("The sum of rows in Caculated Variation table =" + sum2);
+    }  
+    for(int k=0;k<colSum2.length;k++){
+        
+    System.out.println("The sum of columns in Caculated Variation table =" + colSum2[k]);
+    } 
+        
+           
         int fittestIndex = 0;
         double bestFitnes = Double.MIN_VALUE;
-        double currentFitness;
-        
+        double currentFitness = sum1-sum2;              //current fitness is taken from substraction of total value from 
+                                                        //table Sensor and Calculated Variation
+      
         for (int i = 0; i < individuals.length; i++) {
             currentFitness = getFitness(individuals[i]);
             if (currentFitness>bestFitnes)
