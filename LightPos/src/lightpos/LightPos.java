@@ -15,13 +15,13 @@ public class LightPos {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        int numParents = 100;
-        int numOffspring = 200;
-        double mutationInitialStepSize = 20;
-        int terminationCount = 5000;
-        int n = 6; //number of lights
+        int numParents = 30;
+        int numOffspring = 250;
+        double mutationInitialStepSize = 1;
+        int terminationCount = 10000000;
+        int n = 8; //number of lights
         int roomWidth = 120; //inches
-        int roomLength = 120; // inches
+        int roomLength = 180; // inches
         //int optimalLightHeight = 36; // inches (Not currently implemented
         
         LightPos_API myApi = new LightPos_API(numParents, numOffspring, n, 
