@@ -54,8 +54,8 @@ public class LightPos_API {
     private final double overallLearningRate;
     private final double coordinateLearningRate;
     private final int roomWidth;
-    private final int roomHeight;
-      private int row = 7;
+    private final int roomLength;
+    private int row = 7;
     private int col = 7;
     private int [][] matrix;
     
@@ -99,6 +99,15 @@ public class LightPos_API {
      */
     private void init() {
         // Initialize parent values:
+        for (light[] parent : parents) {
+            for (int i = 0; i < nNumber; i++) {
+                parent[i] = new light(
+                        generatorRandom.nextInt(roomWidth+1),
+                        generatorRandom.nextInt(roomLength+1),
+                        generatorRandom.nextInt(5),
+                        generatorRandom.nextBoolean());
+            }
+        }
     }
     
     /**
@@ -213,7 +222,7 @@ public class LightPos_API {
             // second: y position (inches)
             // third: intesity option (there are 5 choices)
             double[] minVal = {0, 0, 0, 0};
-            double[] maxVal = {roomWidth, roomHeight, 4, 1};
+            double[] maxVal = {roomWidth, roomLength, 4, 1};
 
             // mutate position parameters
             double oldStepSize;
@@ -260,81 +269,74 @@ public class LightPos_API {
      */
     private int getFittestIndex(light [][] solutions)
     {
-        int sum1 =0;
-        int sum2 = 0;
-        
-        
-        
-        //Create 2D array to input values for Sensor
-        int[][] inputSensor = new int[row][col];
-        Scanner in = new Scanner(System.in);
-        for(int row = 0; row< matrix.length; row++){ 
-              for(int col = 0 ;col< matrix[row].length; col++){ 
-                   System.out.println("enter the elements for the Input Sensor"); 
-                  inputSensor[row][col] = in.nextInt(); 
-               } System.out.println(); 
-          } 
-
-           for(int row = 0; row< matrix.length; row++){
-       for(int col = 0 ;col< matrix[row].length; col++){ 
-             System.out.println(inputSensor[row][col]);
-       } 
-      System.out.println(); 
-         }
-         
-           // Create 2D array to imputvalues for calculated variation
-           int[][] calVar = new int[row][col];
-     
-        for(int row = 0; row< matrix.length; row++){ 
-              for(int col = 0 ;col< matrix[row].length; col++){ 
-                   System.out.println("enter the elements for the Calculated Variation"); 
-                  calVar[row][col] = in.nextInt(); 
-               } System.out.println(); 
-          } 
-
-           for(int row = 0; row< matrix.length; row++){
-       for(int col = 0 ;col< matrix[row].length; col++){ 
-             System.out.println(calVar[row][col]);
-       } 
-      System.out.println(); 
-         }
-          
-           //Sum all the rows and columns in the Sensor table
-        int[] colSum1 =new int[inputSensor[0].length];
-        for (int i = 0; i < inputSensor.length; i++){   
-        for (int j = 0; j < inputSensor[i].length; j++){                
-        sum1 += inputSensor[i][j];
-        colSum1[j] += inputSensor[i][j];
-    }
-    System.out.println("The sum of rows in Sensor table =" + sum1);
-    }  
-    for(int k=0;k<colSum1.length;k++){
-    System.out.println("The sum of columns in Sensor table =" + colSum1[k]);
-    } 
-         
-    
-            //Sum all the rows and columns in the Caculated Variation table
-            int[] colSum2 =new int[calVar[0].length];
-        for (int i = 0; i < calVar.length; i++){   
-        for (int j = 0; j < calVar[i].length; j++){                
-        sum2 += calVar[i][j];
-        colSum2[j] += calVar[i][j];
-    }
-    System.out.println("The sum of rows in Caculated Variation table =" + sum2);
-    }  
-    for(int k=0;k<colSum2.length;k++){
-        
-    System.out.println("The sum of columns in Caculated Variation table =" + colSum2[k]);
-    } 
-        
-           
-                  
-      
+//        int sum1 =0;
+//        int sum2 = 0;
+//        
+//        //Create 2D array to input values for Sensor
+//        int[][] inputSensor = new int[row][col];
+//        Scanner in = new Scanner(System.in);
+//        for(int row = 0; row< matrix.length; row++){ 
+//            for(int col = 0 ;col< matrix[row].length; col++){ 
+//                System.out.println("enter the elements for the Input Sensor"); 
+//                inputSensor[row][col] = in.nextInt(); 
+//            } System.out.println(); 
+//        } 
+//
+//        for(int row = 0; row< matrix.length; row++){
+//            for(int col = 0 ;col< matrix[row].length; col++){ 
+//                 System.out.println(inputSensor[row][col]);
+//            } 
+//            System.out.println(); 
+//        }
+//         
+//        // Create 2D array to imputvalues for calculated variation
+//        int[][] calVar = new int[row][col];
+//     
+//        for(int row = 0; row< matrix.length; row++){ 
+//            for(int col = 0 ;col< matrix[row].length; col++){ 
+//                System.out.println("enter the elements for the Calculated Variation"); 
+//                calVar[row][col] = in.nextInt(); 
+//            }
+//            System.out.println(); 
+//        } 
+//
+//        for(int row = 0; row< matrix.length; row++){
+//            for(int col = 0 ;col< matrix[row].length; col++){ 
+//                System.out.println(calVar[row][col]);
+//            } 
+//            System.out.println(); 
+//        }
+//          
+//        //Sum all the rows and columns in the Sensor table
+//        int[] colSum1 =new int[inputSensor[0].length];
+//        for (int i = 0; i < inputSensor.length; i++){   
+//            for (int j = 0; j < inputSensor[i].length; j++){                
+//                sum1 += inputSensor[i][j];
+//                colSum1[j] += inputSensor[i][j];
+//            }
+//            System.out.println("The sum of rows in Sensor table =" + sum1);
+//        }  
+//        for(int k=0;k<colSum1.length;k++){
+//            System.out.println("The sum of columns in Sensor table =" + colSum1[k]);
+//        }
+//    
+//        //Sum all the rows and columns in the Caculated Variation table
+//        int[] colSum2 =new int[calVar[0].length];
+//        for (int i = 0; i < calVar.length; i++){   
+//            for (int j = 0; j < calVar[i].length; j++){                
+//                sum2 += calVar[i][j];
+//                colSum2[j] += calVar[i][j];
+//            }
+//            System.out.println("The sum of rows in Caculated Variation table =" + sum2);
+//        }  
+//        for(int k=0;k<colSum2.length;k++){
+//            System.out.println("The sum of columns in Caculated Variation table =" + colSum2[k]);
+//        }
+//        
         int fittestIndex = 0;
         double bestFitnes = Double.MIN_VALUE;
-        double currentFitness= sum1-sum2;               //current fitness is taken from substraction of total value from 
-                                                        //table Sensor and Calculated Variation
-        
+        //double currentFitness= sum1-sum2;
+        double currentFitness;
         for (int i = 0; i < solutions.length; i++) {
             currentFitness = getFitness(solutions[i]);
             if (currentFitness>bestFitnes)
@@ -385,12 +387,40 @@ public class LightPos_API {
     // a 2D array of double values.
     public double[][] getLightGrid(light[] solution)
     {
-        int horizontalPoints = (int) Math.floor(roomWidth / 12);
-        int verticalPoints = (int) Math.floor(roomHeight / 12);
-        double[][] lightGrid = new double[horizontalPoints][verticalPoints];
+        // divide the room up into a grid or 1 foot between each grid point
+        int gridRows = (int) Math.floor(roomWidth / 12);
+        int gridColumns = (int) Math.floor(roomLength / 12);
+        // The offset from the origin to center the grid in the room in inches
+        int originRowOffset = (roomWidth % 12) / 2; 
+        int originColumnOffset = (roomLength % 12) / 2; 
+        double[][] lightGrid = new double[gridRows][gridColumns];
         // Logic for getting the light intensity at every point
         // This is based on the following Excel file: 
         //      "LightCollectorAlgorithms.xlsx"
+        double dist;
+        
+        for (int i = 0; i < gridRows; i++) {
+            for (int j = 0; j < gridColumns; j++) {
+                lightGrid[i][j] = 0.0;
+                // For the current cell of the grid
+                for (int k = 0; k < solution.length; k++) {
+                    // Get the distance from each light to myself
+                    int x1 = solution[k].getPos_x();
+                    int y1 = solution[k].getPos_y();
+                    int x2 = originRowOffset + (i * 12);
+                    int y2 = originColumnOffset + (k * 12);
+                    dist = Math.sqrt(((x2-x1)^2)+((y2-y1)^2));
+                    // This distance is the max horizontal distance of light
+                    // given a 110 degree angle spread of the light from a 
+                    // nine-foot ceiling to the floor.
+                    if (dist > 12.853)
+                    {
+                        //Add the light intensity, if it's close enough
+                        lightGrid[i][j] += (1/dist)*solution[k].getIntensity();
+                    }
+                }
+            }
+        }
         
         return lightGrid;
     }
@@ -402,12 +432,100 @@ public class LightPos_API {
     //      returnFitness = overall brightness - overall light variation
     public double getFitnessHelper(double[][] lightGrid)
     {
-        double result = 0.0;
+        double overallLightIntensity = 0.0;
+        double overallLightVariation = 0.0;
         
         // This is based on the following Excel file: 
         //      "FitnessCalculator.xlsx"
+        int rows = lightGrid.length;
+        int cols = lightGrid[0].length;
         
-        return result;
+        // Get the overall light by adding all the sensor inputs together
+        // Inner points, then outer point
+        for (int i = 1; i < rows-1; i++) {
+            for (int j = 1; j < cols-1; j++) {
+                overallLightIntensity += lightGrid[i][j];
+                overallLightVariation += 
+                        Math.abs(lightGrid[i][j] - lightGrid[i-1][j-1]) + 
+                        Math.abs(lightGrid[i][j] - lightGrid[i-1][j]) + 
+                        Math.abs(lightGrid[i][j] - lightGrid[i-1][j+1]) + 
+                        Math.abs(lightGrid[i][j] - lightGrid[i][j+1]) + 
+                        Math.abs(lightGrid[i][j] - lightGrid[i+1][j+1]) + 
+                        Math.abs(lightGrid[i][j] - lightGrid[i+1][j]) + 
+                        Math.abs(lightGrid[i][j] - lightGrid[i+1][j-1]) + 
+                        Math.abs(lightGrid[i][j] - lightGrid[i][j-1]);
+            }
+        }
+        // First column, minus the corners
+        for (int i = 1; i < rows-1; i++) {
+            overallLightIntensity += lightGrid[i][0];
+            overallLightVariation += 
+                    Math.abs(lightGrid[i][0] - lightGrid[i-1][0]) + 
+                    Math.abs(lightGrid[i][0] - lightGrid[i-1][1]) + 
+                    Math.abs(lightGrid[i][0] - lightGrid[i][1]) + 
+                    Math.abs(lightGrid[i][0] - lightGrid[i+1][1]) + 
+                    Math.abs(lightGrid[i][0] - lightGrid[i+1][0]);
+        }
+        // Last column, minus the corners
+        for (int i = 1; i < rows-1; i++) {
+            overallLightIntensity += lightGrid[i][cols-1];
+            overallLightVariation += 
+                    Math.abs(lightGrid[i][cols-1] - lightGrid[i-1][cols-1]) + 
+                    Math.abs(lightGrid[i][cols-1] - lightGrid[i-1][cols-2]) + 
+                    Math.abs(lightGrid[i][cols-1] - lightGrid[i][cols-2]) + 
+                    Math.abs(lightGrid[i][cols-1] - lightGrid[i+1][cols-2]) + 
+                    Math.abs(lightGrid[i][cols-1] - lightGrid[i+1][cols-1]);
+        }
+        // First row, minus the corners
+        for (int j = 1; j < cols-1; j++) {
+            overallLightIntensity += lightGrid[0][j];
+            overallLightVariation += 
+                    Math.abs(lightGrid[0][j] - lightGrid[0][j-1]) + 
+                    Math.abs(lightGrid[0][j] - lightGrid[1][j-1]) + 
+                    Math.abs(lightGrid[0][j] - lightGrid[1][j]) + 
+                    Math.abs(lightGrid[0][j] - lightGrid[1][j+1]) + 
+                    Math.abs(lightGrid[0][j] - lightGrid[0][j+1]);
+        }
+        // Last row, minus the corners
+        for (int j = 1; j < cols-1; j++) {
+            overallLightIntensity += lightGrid[rows-1][j];
+            overallLightVariation += 
+                    Math.abs(lightGrid[rows-1][j] - lightGrid[rows-1][j-1]) + 
+                    Math.abs(lightGrid[rows-1][j] - lightGrid[rows-2][j-1]) + 
+                    Math.abs(lightGrid[rows-1][j] - lightGrid[rows-2][j]) + 
+                    Math.abs(lightGrid[rows-1][j] - lightGrid[rows-2][j+1]) + 
+                    Math.abs(lightGrid[rows-1][j] - lightGrid[rows-1][j+1]);
+        }
+        
+        //top left corner
+        overallLightIntensity += lightGrid[0][0];
+        overallLightVariation += 
+                    Math.abs(lightGrid[0][0] - lightGrid[0][1]) + 
+                    Math.abs(lightGrid[0][0] - lightGrid[1][1]) + 
+                    Math.abs(lightGrid[0][0] - lightGrid[1][0]);
+        
+        //top right corner
+        overallLightIntensity += lightGrid[0][cols-1];
+        overallLightVariation += 
+                    Math.abs(lightGrid[0][cols-1] - lightGrid[0][cols-2]) + 
+                    Math.abs(lightGrid[0][cols-1] - lightGrid[1][cols-2]) + 
+                    Math.abs(lightGrid[0][cols-1] - lightGrid[1][cols-1]);
+        
+        //bottom right corner
+        overallLightIntensity += lightGrid[rows-1][cols-1];
+        overallLightVariation += 
+                    Math.abs(lightGrid[rows-1][cols-1] - lightGrid[rows-2][cols-1]) + 
+                    Math.abs(lightGrid[rows-1][cols-1] - lightGrid[rows-2][cols-2]) + 
+                    Math.abs(lightGrid[rows-1][cols-1] - lightGrid[rows-1][cols-2]);
+        
+        //bottom lwft corner
+        overallLightIntensity += lightGrid[rows-1][0];
+        overallLightVariation += 
+                    Math.abs(lightGrid[rows-1][0] - lightGrid[rows-2][0]) + 
+                    Math.abs(lightGrid[rows-1][0] - lightGrid[rows-2][1]) + 
+                    Math.abs(lightGrid[rows-1][0] - lightGrid[rows-1][1]);
+        
+        return overallLightIntensity - overallLightVariation;
     }
     
     public int getSolutionWatts(light[] solution)
@@ -429,7 +547,7 @@ public class LightPos_API {
         children = new light[100][nNumber];
         mutationInitialStepSize = 1;
         roomWidth = 240;
-        roomHeight = 120;
+        roomLength = 120;
         terminationCount = 10000;
         overallLearningRate= 1.0 / Math.sqrt(2. * nNumber * 4);
         coordinateLearningRate = 1.0 / Math.sqrt(2 * Math.sqrt(nNumber));
@@ -449,7 +567,7 @@ public class LightPos_API {
         mutationInitialStepSize = mutationStSz;
         terminationCount = terminationNumber;
         roomWidth = width;
-        roomHeight = height;
+        roomLength = height;
         overallLearningRate= 1.0 / Math.sqrt(2. * nNumber * 4);
         coordinateLearningRate = 1.0 / Math.sqrt(2 * Math.sqrt(nNumber));
         mutationStepSize = new double[pNumber];

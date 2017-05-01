@@ -88,29 +88,35 @@ class light {
         }
     }
     
+    //enum for initialization
     public int getIntensityOp()
     {
         return this.intensityOp;
     }
     
+    //candellas
     public double getIntensity()
     {
         return this.intensity;
     }
     
+    //watts
     public int getWatts()
     {
         return this.watts;
     }
-
+    
+    //inches
     public int getPos_x() {
         return pos_x;
     }
-
+    
+    //inches
     public int getPos_y() {
         return pos_y;
     }
-
+    
+    //boolean
     public boolean isOn() {
         return power;
     }
