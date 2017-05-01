@@ -1,5 +1,4 @@
 package lightpos;
-import java.util.Scanner;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -55,8 +54,8 @@ public class LightPos_API {
     private final double coordinateLearningRate;
     private final int roomWidth;
     private final int roomLength;
-    private int row = 7;
-    private int col = 7;
+    // private int row = 7;
+    // private int col = 7;
     private int [][] matrix;
     
     // Randomization generator
@@ -71,7 +70,7 @@ public class LightPos_API {
         init();
         int fitIndex;
         double curFitness;
-        double bestFitness = Double.MAX_VALUE;
+        double bestFitness = -Double.MAX_VALUE;
         light[] bestSolution = {};
         
         do {
@@ -83,6 +82,7 @@ public class LightPos_API {
             //Check to see if it beats the current best solution
             if (curFitness > bestFitness)
             {
+                System.out.println("Better solution found:" + curFitness);
                 bestFitness = curFitness;
                 bestSolution = parents[fitIndex];
             }
@@ -105,7 +105,7 @@ public class LightPos_API {
                         generatorRandom.nextInt(roomWidth+1),
                         generatorRandom.nextInt(roomLength+1),
                         generatorRandom.nextInt(5),
-                        generatorRandom.nextBoolean());
+                        true);// generatorRandom.nextBoolean()
             }
         }
     }
@@ -143,6 +143,11 @@ public class LightPos_API {
         double [][]currentFitness = new double[children.length][2];
         for (int i = 0; i < children.length; i++) {
             currentFitness[i][0] = getFitness(children[i]);
+            if (Double.isNaN(currentFitness[i][0]))
+            {
+                // If, for whatever reason, an invalid value is found
+                currentFitness[i][0] = -Double.MAX_VALUE;
+            }
             currentFitness[i][1] = i;
         }
         // Sort the children by fitness
@@ -150,25 +155,11 @@ public class LightPos_API {
                 Double.compare(o1[0], o2[0]));
         
         // Select the children with the best fitness to succeed the parents
-        if (parents.length <= children.length)
-        {
-            for (int i = 0; i < parents.length; i++) {
-                parents[i] = children[
-                        (int)(currentFitness[children.length-i-1][1])];
-            }
-        }
-        else{
-            int index = children.length - 1;
-            int parentsLeft = parents.length;
-            do
-            {
-                if (index == 0)
-                    index = children.length - 1;
-                
-                parents[index] = children[
-                        (int)(currentFitness[children.length-index][1])];
-                parentsLeft--;
-            }while (parentsLeft > 0);
+        // We assume that the number of parents is ALWAYS less than the number 
+        // of children.
+        for (int i = 0; i < parents.length; i++) {
+            parents[i] = children[
+                    (int)(currentFitness[children.length-i-1][1])];
         }
     }
     
@@ -236,12 +227,10 @@ public class LightPos_API {
                     ithNormal = generatorRandom.nextGaussian();
 
                     // Mutate the step size
-                    mutationStepSize[i] = (int) Math.round(
-                            mutationStepSize[i] * (
-                                    Math.pow( Math.E, (overallLearningRate * 
-                                                    generatorRandom.nextGaussian())
-                                                    + (coordinateLearningRate * 
-                                                            ithNormal))));
+                    mutationStepSize[i] = mutationStepSize[i] * (Math.pow( 
+                            Math.E, (overallLearningRate * 
+                                    generatorRandom.nextGaussian())
+                                    + (coordinateLearningRate * ithNormal)));
 
                     // Mutate the individual using modified step size
                     newIndividual[i] = oldIndividual[i] + 
@@ -254,7 +243,7 @@ public class LightPos_API {
                     (int) Math.round(newIndividual[0]),
                     (int) Math.round(newIndividual[1]),
                     (int) Math.round(newIndividual[2]),
-                    ((int) Math.round(newIndividual[0]) == 1));
+                    (Math.round(newIndividual[3]) >= 1.0));
             
             resultSolution[a] = resultLight;
         }
@@ -269,83 +258,17 @@ public class LightPos_API {
      */
     private int getFittestIndex(light [][] solutions)
     {
-//        int sum1 =0;
-//        int sum2 = 0;
-//        
-//        //Create 2D array to input values for Sensor
-//        int[][] inputSensor = new int[row][col];
-//        Scanner in = new Scanner(System.in);
-//        for(int row = 0; row< matrix.length; row++){ 
-//            for(int col = 0 ;col< matrix[row].length; col++){ 
-//                System.out.println("enter the elements for the Input Sensor"); 
-//                inputSensor[row][col] = in.nextInt(); 
-//            } System.out.println(); 
-//        } 
-//
-//        for(int row = 0; row< matrix.length; row++){
-//            for(int col = 0 ;col< matrix[row].length; col++){ 
-//                 System.out.println(inputSensor[row][col]);
-//            } 
-//            System.out.println(); 
-//        }
-//         
-//        // Create 2D array to imputvalues for calculated variation
-//        int[][] calVar = new int[row][col];
-//     
-//        for(int row = 0; row< matrix.length; row++){ 
-//            for(int col = 0 ;col< matrix[row].length; col++){ 
-//                System.out.println("enter the elements for the Calculated Variation"); 
-//                calVar[row][col] = in.nextInt(); 
-//            }
-//            System.out.println(); 
-//        } 
-//
-//        for(int row = 0; row< matrix.length; row++){
-//            for(int col = 0 ;col< matrix[row].length; col++){ 
-//                System.out.println(calVar[row][col]);
-//            } 
-//            System.out.println(); 
-//        }
-//          
-//        //Sum all the rows and columns in the Sensor table
-//        int[] colSum1 =new int[inputSensor[0].length];
-//        for (int i = 0; i < inputSensor.length; i++){   
-//            for (int j = 0; j < inputSensor[i].length; j++){                
-//                sum1 += inputSensor[i][j];
-//                colSum1[j] += inputSensor[i][j];
-//            }
-//            System.out.println("The sum of rows in Sensor table =" + sum1);
-//        }  
-//        for(int k=0;k<colSum1.length;k++){
-//            System.out.println("The sum of columns in Sensor table =" + colSum1[k]);
-//        }
-//    
-//        //Sum all the rows and columns in the Caculated Variation table
-//        int[] colSum2 =new int[calVar[0].length];
-//        for (int i = 0; i < calVar.length; i++){   
-//            for (int j = 0; j < calVar[i].length; j++){                
-//                sum2 += calVar[i][j];
-//                colSum2[j] += calVar[i][j];
-//            }
-//            System.out.println("The sum of rows in Caculated Variation table =" + sum2);
-//        }  
-//        for(int k=0;k<colSum2.length;k++){
-//            System.out.println("The sum of columns in Caculated Variation table =" + colSum2[k]);
-//        }
-//        
         int fittestIndex = 0;
-        double bestFitnes = Double.MIN_VALUE;
-        //double currentFitness= sum1-sum2;
+        double bestFitnes = -Double.MAX_VALUE;
         double currentFitness;
         for (int i = 0; i < solutions.length; i++) {
             currentFitness = getFitness(solutions[i]);
-            if (currentFitness>bestFitnes)
+            if ( Double.compare(currentFitness, bestFitnes) > 0)
             {
                 fittestIndex = i;
                 bestFitnes = currentFitness;
             }
         }
-        
         return fittestIndex;
     }
     
@@ -378,8 +301,8 @@ public class LightPos_API {
      */
     public double getFitness(light[] solution)
     {
-        return (getFitnessHelper(getLightGrid(solution)) / 
-                nNumber * getSolutionWatts(solution));
+        return (getFitnessHelper(getLightGrid(solution)) - nNumber 
+                - getSolutionWatts(solution));
     }
     
     // This is the first step, setting up the light grid and getting the light
@@ -401,22 +324,29 @@ public class LightPos_API {
         
         for (int i = 0; i < gridRows; i++) {
             for (int j = 0; j < gridColumns; j++) {
-                lightGrid[i][j] = 0.0;
+                // lightGrid[i][j] = 0.0;
                 // For the current cell of the grid
                 for (int k = 0; k < solution.length; k++) {
                     // Get the distance from each light to myself
                     int x1 = solution[k].getPos_x();
                     int y1 = solution[k].getPos_y();
                     int x2 = originRowOffset + (i * 12);
-                    int y2 = originColumnOffset + (k * 12);
-                    dist = Math.sqrt(((x2-x1)^2)+((y2-y1)^2));
+                    int y2 = originColumnOffset + (j * 12);
+                    dist = Math.sqrt(Math.pow(x2-x1,2)+Math.pow(y2-y1,2));
                     // This distance is the max horizontal distance of light
                     // given a 110 degree angle spread of the light from a 
                     // nine-foot ceiling to the floor.
-                    if (dist > 12.853)
+                    if (dist <= 154.24)
                     {
-                        //Add the light intensity, if it's close enough
-                        lightGrid[i][j] += (1/dist)*solution[k].getIntensity();
+                        if (dist >= 1.0)
+                        {
+                            //Add the light intensity, if it's close enough
+                            lightGrid[i][j] += (1/dist)*solution[k].getIntensity();
+                        }
+                        else
+                        {
+                            lightGrid[i][j] += solution[k].getIntensity();
+                        }
                     }
                 }
             }

@@ -21,8 +21,8 @@ class light {
     public light() {
         this.pos_x = 0;
         this.pos_y = 0;
-        this.intensityOp = 0;
-        this.power = false;
+        this.intensityOp = 1;
+        this.power = true;
         switch(this.intensityOp)
         {
             case 0:
