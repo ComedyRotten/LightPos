@@ -51,12 +51,11 @@ public class LightPos_API {
     private final double[] mutationStepSize;
     private int terminationCount;
     private final int nNumber; // number of lights
-    private final int pNumber = 4; // number of lights
+    private final int pNumber = 4; // number of light parameters
     private final double overallLearningRate;
     private final double coordinateLearningRate;
     private final int roomWidth;
     private final int roomLength;
-    private int [][] matrix;
 
     // Randomization generator
     private final Random generatorRandom = new Random();
@@ -66,29 +65,57 @@ public class LightPos_API {
      * @return Returns a parameter set that gives the best fitness.
      */
     public light[] getBestSolution() {
-
-        init();
         int fitIndex;
         double curFitness;
+        double bestPerRunFitness = -Double.MAX_VALUE;
         double bestFitness = -Double.MAX_VALUE;
+        light[] bestPerRunSolution = {};
         light[] bestSolution = {};
+        int noProgressCount = 0;
         
-        do {
-            generateOffspring();
-            selectParents();
-            fitIndex = getFittestIndex(parents);
-            curFitness = getFitness(parents[fitIndex]);
+        init();
+        
+        // The out loop will keep doing more runs after one run has stagnated
+        // until the termination counter has reached zero.
+        do
+        {
+            //init();
+            resetMutationStepSize();
+            bestPerRunFitness = -Double.MAX_VALUE;
+            noProgressCount = 0;
+            do {
+                noProgressCount++;
+                generateOffspring();
+                selectParents();
+                fitIndex = getFittestIndex(parents);
+                curFitness = getFitness(parents[fitIndex]);
+
+                //Check to see if it beats the current best solution
+                if (curFitness > bestPerRunFitness)
+                {
+                    noProgressCount = 0; // reset no progress counter
+                    System.out.println("\nCurrent run best fitness: " + curFitness);
+                    bestPerRunFitness = curFitness;
+                    bestPerRunSolution = parents[fitIndex];
+                }
+
+                System.out.print(".");
+                terminationCount--;
+            } while (terminationCount > 0 && noProgressCount < 150);
             
-            //Check to see if it beats the current best solution
-            if (curFitness > bestFitness)
-            {
-                System.out.println("Better solution found:" + curFitness);
-                bestFitness = curFitness;
-                bestSolution = parents[fitIndex];
+            if (bestPerRunFitness > bestFitness) {
+                bestFitness = bestPerRunFitness;
+                bestSolution = bestPerRunSolution;
+                System.out.println("\nCurrent best overall fitness: " + bestFitness);
             }
             
-            terminationCount--;
-        } while (terminationCount > 0);
+            if (terminationCount > 0)
+            {
+                //System.out.println("\nStarting another run...");
+                System.out.println("\nResetting mutation step size...");
+            }
+        }while(terminationCount > 0);
+        
         
         return bestSolution;
     }
@@ -105,8 +132,15 @@ public class LightPos_API {
                         generatorRandom.nextInt(roomWidth+1),
                         generatorRandom.nextInt(roomLength+1),
                         generatorRandom.nextInt(5),
-                        true);// generatorRandom.nextBoolean()
+                        generatorRandom.nextBoolean());
             }
+        }
+    }
+    
+    //Reset the mutation step size
+    private void resetMutationStepSize(){
+        for (int i = 0; i < pNumber; i++) {
+            mutationStepSize[i] = mutationInitialStepSize;
         }
     }
     
@@ -165,8 +199,8 @@ public class LightPos_API {
     
     /**
      * recombine
-     * @param x Double array representing a parameter set
-     * @param y Double array representing a parameter set
+     * @param x light array representing a solution
+     * @param y light array representing a solution
      * @return Return either x or y (discrete recombination)
      */
     private light[] recombine(light[] x, light[] y) {
@@ -178,8 +212,8 @@ public class LightPos_API {
     
     /**
      * mutate
-     * @param individual Double array representing a parameter set
-     * @return Returns the modified parameter set. Uses method from page 76.
+     * @param individual light array representing a solution
+     * @return Returns the modified solution. Uses method from page 76.
      * Uncorrelated mutation with n step sizes.
      * 
      * Will not return until the hard-coded parameter bound requirements have
@@ -201,22 +235,24 @@ public class LightPos_API {
         double ithNormal;
         light[] resultSolution = new light[nNumber];
         light individualLight;
+        double[] oldIndividual = new double[4], newIndividual = new double[4];
+        double oldStepSize;
+        
+        // Hard-coded parameter bounds (inclusive)
+        // first: x position (inches)
+        // second: y position (inches)
+        // third: intesity option (there are 5 choices)
+        double[] minVal = {0, 0, 0, 0};
+        double[] maxVal = {roomWidth, roomLength, 4, 1};
+        
         for (int a = 0; a< solution.length; a++) {
             individualLight = solution[a];
-            double[] oldIndividual = { individualLight.getPos_x(), 
-                individualLight.getPos_y(), individualLight.getIntensityOp(), 
-                individualLight.isOn() ? 1 : 0};
-            double[] newIndividual = new double[4];
-
-            // Hard-coded parameter bounds (inclusive)
-            // first: x position (inches)
-            // second: y position (inches)
-            // third: intesity option (there are 5 choices)
-            double[] minVal = {0, 0, 0, 0};
-            double[] maxVal = {roomWidth, roomLength, 4, 1};
+            oldIndividual[0] = individualLight.getPos_x();
+            oldIndividual[1] = individualLight.getPos_y();
+            oldIndividual[2] = individualLight.getIntensityOp();
+            oldIndividual[3] = individualLight.isOn() ? 1 : 0 ;
 
             // mutate position parameters
-            double oldStepSize;
             for (int i = 0; i < pNumber; i++) {
                 // Force it to repeat until the mutation is within bounds
                 oldStepSize = mutationStepSize[i];
@@ -243,7 +279,7 @@ public class LightPos_API {
                     (int) Math.round(newIndividual[0]),
                     (int) Math.round(newIndividual[1]),
                     (int) Math.round(newIndividual[2]),
-                    (Math.round(newIndividual[3]) >= 1.0));
+                    (Math.round(newIndividual[3]) == 1.0));
             
             resultSolution[a] = resultLight;
         }
@@ -301,14 +337,30 @@ public class LightPos_API {
      */
     public double getFitness(light[] solution)
     {
-        return (getFitnessHelper(getLightGrid(solution)) - nNumber 
+        // If no lights are on, it is not a valid solution
+        if (getOnLights(solution)==0) {
+            return -Double.MAX_VALUE;
+        }
+        // Only do these calculations if there are lights on
+        return (getFitnessHelper(getLightGrid(solution)) - getOnLights(solution) 
                 - getSolutionWatts(solution));
+    }
+    
+    private int getOnLights(light[] solution)
+    {
+        int lightsOnCount = 0;
+        for (int i = 0; i < solution.length; i++) {
+            if (solution[i].isOn()) {
+                lightsOnCount++;
+            }
+        }
+        return lightsOnCount;
     }
     
     // This is the first step, setting up the light grid and getting the light
     // intensity in candellas for each "sensor" point on the grid and returning
     // a 2D array of double values.
-    public double[][] getLightGrid(light[] solution)
+    private double[][] getLightGrid(light[] solution)
     {
         // divide the room up into a grid or 1 foot between each grid point
         int gridRows = (int) Math.floor(roomWidth / 12);
@@ -321,6 +373,10 @@ public class LightPos_API {
         // This is based on the following Excel file: 
         //      "LightCollectorAlgorithms.xlsx"
         double dist;
+        int x1;
+        int y1;
+        int x2;
+        int y2;
         
         for (int i = 0; i < gridRows; i++) {
             for (int j = 0; j < gridColumns; j++) {
@@ -328,10 +384,10 @@ public class LightPos_API {
                 // For the current cell of the grid
                 for (int k = 0; k < solution.length; k++) {
                     // Get the distance from each light to myself
-                    int x1 = solution[k].getPos_x();
-                    int y1 = solution[k].getPos_y();
-                    int x2 = originRowOffset + (i * 12);
-                    int y2 = originColumnOffset + (j * 12);
+                    x1 = solution[k].getPos_x();
+                    y1 = solution[k].getPos_y();
+                    x2 = originRowOffset + (i * 12);
+                    y2 = originColumnOffset + (j * 12);
                     dist = Math.sqrt(Math.pow(x2-x1,2)+Math.pow(y2-y1,2));
                     // This distance is the max horizontal distance of light
                     // given a 110 degree angle spread of the light from a 
@@ -345,13 +401,13 @@ public class LightPos_API {
                         }
                         else
                         {
+                            //If it's too close, just add the intensity
                             lightGrid[i][j] += solution[k].getIntensity();
                         }
                     }
                 }
             }
         }
-        
         return lightGrid;
     }
     
@@ -360,7 +416,7 @@ public class LightPos_API {
     // then gets the total brightness. The difference of these two is the return
     // value:
     //      returnFitness = overall brightness - overall light variation
-    public double getFitnessHelper(double[][] lightGrid)
+    private double getFitnessHelper(double[][] lightGrid)
     {
         double overallLightIntensity = 0.0;
         double overallLightVariation = 0.0;
@@ -458,11 +514,13 @@ public class LightPos_API {
         return overallLightIntensity - overallLightVariation;
     }
     
-    public int getSolutionWatts(light[] solution)
+    private int getSolutionWatts(light[] solution)
     {
         int totalWatts = 0;
         for (int i = 0; i < nNumber; i++) {
-            totalWatts += solution[i].getWatts();
+            if (solution[i].isOn()) {
+                totalWatts += solution[i].getWatts();
+            }
         }
         return totalWatts;
     }
@@ -472,7 +530,7 @@ public class LightPos_API {
     // Maximizer_API
     public LightPos_API()
     {
-        nNumber = 6; //number of lights in each solution
+        nNumber = 8; //number of lights in each solution
         parents = new light[10][nNumber];
         children = new light[100][nNumber];
         mutationInitialStepSize = 1;
@@ -502,7 +560,7 @@ public class LightPos_API {
         coordinateLearningRate = 1.0 / Math.sqrt(2 * Math.sqrt(nNumber));
         mutationStepSize = new double[pNumber];
         for (int i = 0; i < pNumber; i++) {
-            mutationStepSize[i] = mutationStSz;
+            mutationStepSize[i] = mutationInitialStepSize;
         }
     }
 }

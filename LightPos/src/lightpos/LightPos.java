@@ -15,20 +15,20 @@ public class LightPos {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        int numParents = 30;
-        int numOffspring = 250;
-        double mutationInitialStepSize = 1;
-        int terminationCount = 10000000;
-        int n = 8; //number of lights
-        int roomWidth = 120; //inches
-        int roomLength = 180; // inches
+        int numParents = 300;
+        int numOffspring = 3000;
+        double mutationInitialStepSize = 2;
+        int terminationCount = 1000;
+        int nL = 14; //number of lights
+        int roomWidth = 96; //inches
+        int roomLength = 96; // inches
         //int optimalLightHeight = 36; // inches (Not currently implemented
         
-        LightPos_API myApi = new LightPos_API(numParents, numOffspring, n, 
+        LightPos_API myApi = new LightPos_API(numParents, numOffspring, nL, 
                 roomWidth, roomLength, 
                 mutationInitialStepSize, terminationCount);
         light[] bestSolution = myApi.getBestSolution();
-        System.out.println("Best solution for " + roomWidth + "\"x" + 
+        System.out.println("\n\nBest solution for " + roomWidth + "\"x" + 
                 roomLength +"\" room: {");
         for (int i = 0; i < bestSolution.length; i++) {
             // If the light is on and contributes to the solution
